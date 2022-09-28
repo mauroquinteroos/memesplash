@@ -1,0 +1,23 @@
+{
+  "name": "memesplash",
+  "version": "0.0.1",
+  "description": "Memesplash",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "Mauro Quinteros <quinterosmauro0599@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "8.24.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-config-standard": "17.0.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-n": "15.3.0",
+    "eslint-plugin-promise": "6.0.1",
+    "nodemon": "2.0.20",
+    "prettier": "2.7.1"
+  }
+}
