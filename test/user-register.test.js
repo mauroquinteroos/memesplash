@@ -1,4 +1,4 @@
-import test from 'ava';
+import { describe, test, expect } from '@jest/globals';
 import fetch from 'node-fetch';
 import { config as dotEnvConfig } from 'dotenv';
 
@@ -20,7 +20,7 @@ const VALID_USER_2 = {
   password: 'test1234',
 };
 
-const fetchRegister = async (test, user) => {
+const fetchRegister = async (user) => {
   try {
     const response = await fetch(ENDPOINT, {
       method: 'POST',
@@ -30,119 +30,123 @@ const fetchRegister = async (test, user) => {
       body: JSON.stringify(user),
     });
     return response;
-  } catch (err) {
-    test.fail(err);
+  } catch (error) {
+    throw Error(`Error calling the endpoint ${ENDPOINT}`);
   }
 };
 
-test.before(() => {});
+describe('User register tests', () => {
+  test('Register successfully', async () => {
+    const EXPECTED_STATUS_CODE = 201;
 
-test('Register successfully', async (test) => {
-  const EXPECTED_STATUS_CODE = 201;
-  const response = await fetchRegister(test, VALID_USER_1);
+    const response = await fetchRegister(VALID_USER_1);
 
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Invalid ID format', async () => {
+    const EXPECTED_STATUS_CODE = 400;
+
+    const user = {
+      ...VALID_USER_1,
+      id: 'invalid-uuid',
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Invalid name format', async () => {
+    const EXPECTED_STATUS_CODE = 400;
+
+    const user = {
+      ...VALID_USER_1,
+      name: 'name-with-./*',
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Invalid email format', async () => {
+    const EXPECTED_STATUS_CODE = 400;
+
+    const user = {
+      ...VALID_USER_1,
+      email: 'emailatemail.com',
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Invalid password format', async () => {
+    const EXPECTED_STATUS_CODE = 400;
+
+    const user = {
+      ...VALID_USER_1,
+      password: '1234',
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Missing fields', async () => {
+    const EXPECTED_STATUS_CODE = 400;
+
+    const user = {
+      id: VALID_USER_1.id,
+      name: VALID_USER_1.name,
+      email: VALID_USER_1.email,
+      // Missing password
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Unnecesary fields', async () => {
+    const EXPECTED_STATUS_CODE = 400;
+
+    const user = {
+      ...VALID_USER_1,
+      age: 25,
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Duplicated ID', async () => {
+    const EXPECTED_STATUS_CODE = 409;
+
+    const user = {
+      ...VALID_USER_2,
+      id: VALID_USER_1.id,
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
+
+  test('Register failed - Duplicated email', async () => {
+    const EXPECTED_STATUS_CODE = 409;
+
+    const user = {
+      ...VALID_USER_2,
+      email: VALID_USER_1.email,
+    };
+
+    const response = await fetchRegister(user);
+
+    expect(response.status).toBe(EXPECTED_STATUS_CODE);
+  });
 });
-
-test('Register failed - Invalid ID format', async (test) => {
-  const EXPECTED_STATUS_CODE = 400;
-
-  const user = {
-    ...VALID_USER_1,
-    id: 'invalid-uuid',
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test('Register failed - Invalid email format', async (test) => {
-  const EXPECTED_STATUS_CODE = 400;
-
-  const user = {
-    ...VALID_USER_1,
-    email: 'emailatemail.com',
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test('Register failed - Invalid password format', async (test) => {
-  const EXPECTED_STATUS_CODE = 400;
-
-  const user = {
-    ...VALID_USER_1,
-    email: '1234',
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test('Register failed - Missing fields', async (test) => {
-  const EXPECTED_STATUS_CODE = 400;
-
-  const user = {
-    id: VALID_USER_1.id,
-    name: VALID_USER_1.name,
-    email: VALID_USER_1.email,
-    // Missing password
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test('Register failed - Unnecesary fields', async (test) => {
-  const EXPECTED_STATUS_CODE = 400;
-
-  const user = {
-    ...VALID_USER_1,
-    age: 25,
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test('Register failed - Duplicated ID', async (test) => {
-  const EXPECTED_STATUS_CODE = 409;
-
-  const user = {
-    ...VALID_USER_2,
-    id: VALID_USER_1.id,
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test('Register failed - Duplicated email', async (test) => {
-  const EXPECTED_STATUS_CODE = 409;
-
-  const user = {
-    ...VALID_USER_2,
-    email: VALID_USER_1.email,
-  };
-
-  const response = await fetchRegister(test, user);
-
-  test.is(response.status, EXPECTED_STATUS_CODE);
-  test.fail(`Expected status code ${EXPECTED_STATUS_CODE}, but received ${response.status}`);
-});
-
-test.after(() => {});
