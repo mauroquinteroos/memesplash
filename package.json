@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "docker:up": "docker-compose -p memesplash up -d",
+    "docker:down": "docker-compose -p memesplash down",
+    "docker:down-volumes": "docker-compose -p memesplash down -v"
   },
   "keywords": [],
   "author": "Mauro Quinteros <quinterosmauro0599@gmail.com>",
@@ -25,7 +28,9 @@
   },
   "dependencies": {
     "bcrypt": "5.1.0",
+    "cors": "2.8.5",
     "dotenv": "16.0.3",
+    "express": "4.18.2",
     "mongoose": "6.7.1",
     "uuid-random": "1.3.2"
   }

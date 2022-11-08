@@ -1,13 +1,13 @@
-import { describe, test, expect } from '@jest/globals';
 import fetch from 'node-fetch';
+import { describe, test, expect } from '@jest/globals';
 import { config as dotEnvConfig } from 'dotenv';
 
 dotEnvConfig();
 
-const ENDPOINT = `http://localhost:${process.env.PORT}/register`;
+const ENDPOINT = `http://localhost:${process.env.PORT}/user/register`;
 
 const VALID_USER_1 = {
-  id: '7c6ac32e-42c8-11ed-b878-0242ac120002',
+  id: '72d10fcd-10f5-4651-b3a3-e5c817700529',
   name: 'Testing',
   email: 'test@gmail.com',
   password: 'test1234',

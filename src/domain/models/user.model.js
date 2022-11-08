@@ -1,9 +1,9 @@
-import { test as uuidTest } from 'uuid-random';
-import { InvalidIdFormatException } from '../errors/invalid-id-format.exception';
-import { InvalidNameFormatException } from '../errors/invalid-name-format.exception';
-import { InvalidEmailFormatException } from '../errors/invalid-email-format.exception';
-import { InvalidPasswordFormatException } from '../errors/invalid-password-format.exception';
-import { hash } from 'bcryptjs';
+import uuidRandom from 'uuid-random';
+import { InvalidIdFormatException } from '../errors/invalid-id-format.exception.js';
+import { InvalidNameFormatException } from '../errors/invalid-name-format.exception.js';
+import { InvalidEmailFormatException } from '../errors/invalid-email-format.exception.js';
+import { InvalidPasswordFormatException } from '../errors/invalid-password-format.exception.js';
+import { hash } from 'bcrypt';
 
 const HASH_SALT = 12;
 
@@ -30,21 +30,13 @@ export class UserModel {
   }
 
   static validateId(id) {
-    return uuidTest(id);
+    return uuidRandom.test(id);
   }
 
   static validateName(name) {
-    const nameRegex = /ˆ[A-Z\s-]{2,30}$/i;
+    const nameRegex = /^(?![\s-])(?!.*[\s-]{2})(?!.*[\s-]$)[A-Z\s-]{2,30}$/i;
 
-    if (!nameRegex.test(name) || name.includes('  ') || name.includes('--')) return false;
-
-    const nameSplitted = name.split(' ');
-
-    for (const word of nameSplitted) {
-      if (word.startsWith('-') || word.endsWith('-')) return false;
-    }
-
-    return true;
+    return nameRegex.test(name);
   }
 
   static validateEmail(email) {
@@ -59,16 +51,24 @@ export class UserModel {
   }
 
   static async create(id, name, email, password) {
-    if (!UserModel.validateId(id)) throw new InvalidIdFormatException();
+    if (!UserModel.validateId(id)) {
+      throw new InvalidIdFormatException();
+    }
 
-    if (!UserModel.validateName(name)) throw new InvalidNameFormatException();
+    if (!UserModel.validateName(name)) {
+      throw new InvalidNameFormatException();
+    }
 
-    if (!UserModel.validateEmail(email)) throw new InvalidEmailFormatException();
+    if (!UserModel.validateEmail(email)) {
+      throw new InvalidEmailFormatException();
+    }
 
-    if (!UserModel.validatePassword(password)) throw new InvalidPasswordFormatException();
+    if (!UserModel.validatePassword(password)) {
+      throw new InvalidPasswordFormatException();
+    }
 
     const hashedPassword = await hash(password, HASH_SALT);
 
-    return UserModel(id, name, email, hashedPassword, undefined, []);
+    return new UserModel(id, name, email, hashedPassword, undefined, []);
   }
 }
