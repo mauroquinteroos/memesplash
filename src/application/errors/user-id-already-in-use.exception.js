@@ -2,6 +2,6 @@ import { ApplicationConflictException } from './application-conflict.exception.j
 
 export class UserIdAlreadyInUseException extends ApplicationConflictException {
   constructor() {
-    super('User ID is already in use');
+    super('This ID is already in use');
   }
 }

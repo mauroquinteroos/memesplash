@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles",
     "docker:up": "docker-compose -p memesplash up -d",
     "docker:down": "docker-compose -p memesplash down",
     "docker:down-volumes": "docker-compose -p memesplash down -v"
@@ -22,9 +22,10 @@
     "eslint-plugin-n": "15.3.0",
     "eslint-plugin-promise": "6.0.1",
     "jest": "29.2.2",
-    "node-fetch": "3.2.10",
+    "mongodb-memory-server": "8.9.5",
     "nodemon": "2.0.20",
-    "prettier": "2.7.1"
+    "prettier": "2.7.1",
+    "supertest": "6.3.1"
   },
   "dependencies": {
     "bcrypt": "5.1.0",

@@ -1,10 +1,12 @@
-import fetch from 'node-fetch';
-import { describe, test, expect } from '@jest/globals';
+import request from 'supertest';
+import { beforeAll, afterAll, describe, test, expect } from '@jest/globals';
 import { config as dotEnvConfig } from 'dotenv';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
+import { bootstrap } from '../src/bootstrap.js';
 
 dotEnvConfig();
 
-const ENDPOINT = `http://localhost:${process.env.PORT}/user/register`;
+const REGISTER_PATH = `/user/register`;
 
 const VALID_USER_1 = {
   id: '72d10fcd-10f5-4651-b3a3-e5c817700529',
@@ -20,18 +22,33 @@ const VALID_USER_2 = {
   password: 'test1234',
 };
 
+let mongoServer;
+let app;
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryReplSet.create({
+    replSet: {
+      count: 1,
+      dbName: 'memesplash',
+    },
+  });
+
+  process.env.MONGODB_URI = mongoServer.getUri();
+
+  app = await bootstrap();
+});
+
+afterAll(async () => {
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+});
+
 const fetchRegister = async (user) => {
   try {
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
-    });
-    return response;
+    return await request(app).post(REGISTER_PATH).send(user);
   } catch (error) {
-    throw Error(`Error calling the endpoint ${ENDPOINT}`);
+    throw Error(`Error calling the endpoint with path ${REGISTER_PATH}`);
   }
 };
 
