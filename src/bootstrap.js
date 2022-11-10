@@ -1,5 +1,4 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import { config as dotenvConfig } from 'dotenv';
 import { UserRoutes } from './infrastructure/routes/user.routes.js';
@@ -7,7 +6,7 @@ import { errorMiddleware } from './infrastructure/middlewares/error.middleware.j
 
 dotenvConfig();
 
-export const bootstrap = async () => {
+export const bootstrap = () => {
   const app = express();
 
   app.use(express.json());
@@ -15,10 +14,6 @@ export const bootstrap = async () => {
 
   app.use('/user', UserRoutes);
   app.use(errorMiddleware);
-
-  await mongoose.connect(process.env.MONGODB_URI, {
-    connectTimeoutMS: 4000,
-  });
 
   return app;
 };
