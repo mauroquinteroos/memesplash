@@ -1,4 +1,5 @@
 import { ApplicationConflictException } from '../../application/errors/application-conflict.exception.js';
+import { ApplicationUnauthorizedException } from '../../application/errors/application-unauthorized.exception.js';
 import { DomainFormatException } from '../../domain/errors/domain-format.exception.js';
 import { InfrastructureFormatException } from '../errors/infrastructure-format.exception.js';
 
@@ -7,6 +8,10 @@ export const errorMiddleware = (err, req, res, next) => {
 
   if (err instanceof DomainFormatException || err instanceof InfrastructureFormatException) {
     return res.status(400).send(err.message);
+  }
+
+  if (err instanceof ApplicationUnauthorizedException) {
+    return res.status(401).send(err.message);
   }
 
   if (err instanceof ApplicationConflictException) {

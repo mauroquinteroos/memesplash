@@ -1,6 +1,8 @@
+import { userLoginUseCase } from '../../application/use-cases/user-login.usecase.js';
 import { userRegisterUseCase } from '../../application/use-cases/user-register.usecase.js';
 import { MissingFieldsFormatException } from '../errors/missing-fields.exception.js';
 import { UnnecesaryFieldsFormatException } from '../errors/unnecesary-fields.exception.js';
+import { signAsync } from '../services/jwt.service.js';
 
 export const userRegisterController = async (req, res, next) => {
   try {
@@ -15,6 +17,29 @@ export const userRegisterController = async (req, res, next) => {
     await userRegisterUseCase(id, name, email, password);
 
     return res.status(201).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const userLoginController = async (req, res, next) => {
+  try {
+    const { email, password, ...rest } = req.body;
+
+    if (!email || !password) {
+      throw new MissingFieldsFormatException();
+    } else if (Object.keys(rest).length !== 0) {
+      throw new UnnecesaryFieldsFormatException();
+    }
+
+    const id = await userLoginUseCase(email, password);
+
+    const payload = { id };
+    const signOptions = { algorithm: 'HS512', expiresIn: '7d' };
+
+    const token = await signAsync(payload, signOptions);
+
+    return res.send({ token });
   } catch (err) {
     next(err);
   }
